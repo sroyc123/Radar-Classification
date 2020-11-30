@@ -1,0 +1,105 @@
+Investigate Sequence Data
+Instructions are in the task pane to the left. Complete and submit each task one at a time.
+
+This code loads the instrument recordings.
+load instrdata.mat
+Display the class distribution of the training data.
+summary(YTrain)
+
+Task 1
+Extract first sequence
+sequence = XTest{1}
+
+
+
+Task 2
+Extract first label
+
+label = YTest(1)
+
+
+Task 3
+Plot sequence
+plot(sequence)
+
+
+
+Task 4
+Add title
+title(string(label))
+
+
+
+Further Practice
+Try another instrument
+xlabel('Time (samples)')
+
+
+
+
+Create LSTM Architecture
+Instructions are in the task pane to the left. Complete and submit each task one at a time.
+
+Task 1
+Create input layer
+inLayer = sequenceInputLayer(1)
+
+Task 2
+Create BiLSTM layer
+lstm = bilstmLayer(100,'OutputMode','last')
+
+
+
+Task 3
+Create output layers
+outLayers = [
+    fullyConnectedLayer(3);
+    softmaxLayer();
+    classificationLayer()
+    ];
+
+
+
+Task 4
+Combine layers
+layers = [inLayer;lstm;outLayers]
+
+
+
+Evaluate LSTM Network
+Instructions are in the task pane to the left. Complete and submit each task one at a time.
+
+This code loads the instrument recordings and creates the architecture from the previous interaction.
+load instrdata.mat
+
+layers = [
+    sequenceInputLayer(1)
+    bilstmLayer(100,'OutputMode','last')
+    fullyConnectedLayer(3);
+    softmaxLayer();
+    classificationLayer()
+    ];
+This code sets the training options used to train the LSTM.
+options = trainingOptions('adam', ...
+    'MaxEpochs',250, ...
+    'InitialLearnRate',0.005, ...
+    'GradientThreshold',1, ...
+    'Shuffle','every-epoch', ...
+    'Plots','training-progress', ...
+    'LearnRateDropPeriod',200,...
+    'LearnRateSchedule','piecewise');
+With a GPU, you could train this network with this command.
+net = trainNetwork(Xtrain,Ytrain,layers,options);
+Load the trained network.
+load instrnet.mat
+
+Task 1
+Classify test data
+testPred = classify(net,XTest)
+
+
+
+Task 2
+Plot confusion matrix
+
+confusionchart(YTest,testPred)

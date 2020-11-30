@@ -1,0 +1,131 @@
+Investigate Data
+Instructions are in the task pane to the left. Complete and submit each task one at a time.
+
+This code loads the color correction dataset.
+load trData.mat
+The dataset was created from photos such as dog.jpg. Load and display this unprocessed image.
+img = imread('dog.jpg');
+imshow(img)
+
+Task 1
+Get the list of files
+trainfiles = trainingData.File;
+
+Task 2
+Get first altered image
+fn = trainfiles{1};
+
+Task 3
+Read and display image
+im = imread(fn);
+imshow(im)
+
+Task 4
+Get datastore of subset of images
+imds = imageDatastore(trainfiles(1:9));
+
+Task 5
+View montage
+montage(imds)
+
+Task 6
+Get subset of data
+subsetData = trainingData(1:9,:)
+
+
+
+Modify Network for Regression
+Instructions are in the task pane to the left. Complete and submit each task one at a time.
+
+Task 1
+Load AlexNet and get layers
+net = alexnet;
+layers = net.Layers;
+
+
+
+Task 2
+Remove last three layers
+
+
+layers(end-2:end) = [];
+
+Task 3
+Create array of new layers
+
+
+newlayers = [fullyConnectedLayer(3); regressionLayer()];
+
+Task 4
+Add new regression layers
+layers = [layers;newlayers]
+
+
+
+Use Color Corrector
+Instructions are in the task pane to the left. Complete and submit each task one at a time.
+
+This code loads a network trained on the color correction data.
+load colorcastnet.mat
+
+Task 1
+Load and display a test image
+catim = imread('cat.jpg');
+imshow(catim)
+
+Task 2
+Resize image
+testim = imresize(catim,[227 227]);
+imshow(testim)
+
+Task 3
+Predict test images
+predrgb = predict(ccnet,testim)
+
+Task 4
+Use output
+
+fixedim = correctColor(catim,predrgb);
+
+Task 5
+Show fixed image
+
+imshow(fixedim)
+
+This function modifies an input image using a vector of 3 RGB values.
+function fixedim = correctColor(im,rgb)
+    fixedim = uint8(single(im) - reshape(rgb,[1 1 3]));
+end
+
+
+
+Evaluate Color Corrector
+Instructions are in the task pane to the left. Complete and submit each task one at a time.
+
+This code loads a trained network and the testing data.
+load colorcastnet.mat
+load tsData.mat
+
+Task 1
+Predict test images
+predrgb = predict(ccnet,testData)
+
+
+
+Task 2
+Get actual values
+testrgb = testData.Color
+
+
+
+Task 3
+Calculate difference
+err = testrgb - predrgb
+
+
+
+Task 4
+Calculate RMSE
+squares = err.^2
+rmse = sqrt(mean(squares))
+
