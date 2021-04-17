@@ -1,3 +1,6 @@
+clc;
+clear all;
+close all;
 c = 3e8;
 fc = 850e6;
 
@@ -6,15 +9,18 @@ cone =[];
 sphere =[];
 disc =[];
 
-N = 200;
-NumObj=100;
-NumTestObj=ceil(0.2*NumObj);
-NumTrainObj=ceil(0.8*NumObj);
+N = 20;
+NumObj=300;
+NumTestObj=ceil(0.8*NumObj);
+NumTrainObj=ceil(0.2*NumObj);
 for x = 1:NumObj %each x corresponds to different radius object
-    [coneRcs,cone_az,cone_el] = rcstruncone(0,10,10+(x/50),c,fc);
-    [cylRcs,cyl_az,cyl_el] = rcscylinder(10,10,10+(x/50),c,fc);
-    [sprRcs,spr_az,spr_el] = rcssphere(10+(x/50),c,fc);
-    [discRcs,disc_az,disc_el] = rcsdisc(10+(x/50),c,fc);
+    [coneRcs,cone_az,cone_el] = rcstruncone(0,1+(x/3),1+(x/2),c,fc);
+    [cylRcs,cyl_az,cyl_el] = rcscylinder(1+(x/4),1+(x/2),0.5,c,fc);
+    [discRcs,disc_az,disc_el] = rcscylinder(5+(x/3),2+(x/3),2,c,fc);
+    [sprRcs,spr_az,spr_el] = rcstruncone(2,3+(x/2),2+(x/3),c,fc);
+    
+%     [sprRcs,spr_az,spr_el] = rcssphere(1+(x/2),c,fc);
+%     [discRcs,disc_az,disc_el] = rcsdisc(1+(x/2),c,fc);
     
     cyltgt = phased.BackscatterRadarTarget('PropagationSpeed',c,...
     'OperatingFrequency',fc,'AzimuthAngles',cyl_az,'ElevationAngles',cyl_el,'RCSPattern',cylRcs,'Model','Swerling4');
@@ -26,11 +32,11 @@ for x = 1:NumObj %each x corresponds to different radius object
     'OperatingFrequency',fc,'AzimuthAngles',disc_az,'ElevationAngles',disc_el,'RCSPattern',discRcs,'Model','Swerling4');
     
     %rng(2017);
-    az = 180*rand(1,N); 
-    el = 90*rand(1,N); 
+%     az = 180*rand(1,N); 
+%     el = 90*rand(1,N); 
 %     r = a + (b-a).*rand(N,1);
-%     az = linspace(2,178,N); 
-%     el = linspace(2,88,N); 
+    az = linspace(2,178,N); 
+    el = linspace(2,88,N); 
     
     cylSeries=cyltgt(ones(1,N),[az;el],true).';
     coneSeries=conetgt(ones(1,N),[az;el],true).';
@@ -107,9 +113,9 @@ testData = num2cell(table2array(RCSTest)',2);
 testLabels = repelem(categorical({'cylinder','cone','sphere','disc'}),[NumTestObj NumTestObj NumTestObj NumTestObj]);
 testLabels = testLabels(:);
 RNNnet = trainNetwork(trainData,trainLabels,LSTMlayers,options);
-
 predictedLabels = classify(RNNnet,testData,'ExecutionEnvironment','cpu');
 accuracy = sum(predictedLabels == testLabels)*100/size(testLabels,1)
+
 %% 
 
 figure;
